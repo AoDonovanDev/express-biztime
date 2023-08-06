@@ -18,7 +18,10 @@ router.get('/:code', async(req, res, next) => {
   const { code } = req.params;
    try {
     const results = await db.query(`SELECT * FROM companies WHERE code = $1 `, [code]);
-    return res.json({ company: results.rows[0] })
+    if (results.rows.length === 0) {
+      throw new ExpressError(`Can't get company with code of ${code}`, 404)
+    }
+    return res.status(200).json({ company: results.rows[0] })
   } catch (e) {
     return next(e);
   }
@@ -29,7 +32,7 @@ router.post('/', async (req, res, next) => {
   try {
     const { code, name, description } = req.body;
     const results = await db.query('INSERT INTO companies (code, name, description) VALUES ($1, $2, $3) RETURNING code, name, description', [code, name, description]);
-    return res.status(201).json({ user: results.rows[0] })
+    return res.status(201).json({ company: results.rows[0] })
   } catch (e) {
     return next(e)
   }
@@ -43,7 +46,7 @@ router.put('/:code', async (req, res, next) => {
     if (results.rows.length === 0) {
       throw new ExpressError(`Can't update company with code of ${code}`, 404)
     }
-    return res.send({ user: results.rows[0] })
+    return res.send({ company: results.rows[0] })
   } catch (e) {
     return next(e)
   }
