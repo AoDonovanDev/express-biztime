@@ -38,7 +38,12 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { amt } = req.body;
+    const { amt, paid } = req.body;
+    if(paid){
+      const date = new Date()
+      const payUpdate = await db.query('UPDATE invoices SET amt=$1, paid=$3, paid_date=$4 WHERE id=$2 RETURNING id, comp_code, amt, paid, add_date, paid_date', [amt, id, paid, date]);
+      return res.send({ invoice: payUpdate.rows[0] })
+    }
     const results = await db.query('UPDATE invoices SET amt=$1 WHERE id=$2 RETURNING id, comp_code, amt, paid, add_date, paid_date', [amt, id])
     if (results.rows.length === 0) {
       throw new ExpressError(`Can't update invoice with code of ${code}`, 404)
