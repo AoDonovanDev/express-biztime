@@ -8,7 +8,7 @@ const db = require("../db");
 router.get('/', async (req, res, next) => {
   try {
     const results = await db.query(`SELECT * FROM companies`);
-    return res.json({ comapnies: results.rows })
+    return res.json({ companies: results.rows })
   } catch (e) {
     return next(e);
   }
@@ -18,7 +18,7 @@ router.get('/:code', async(req, res, next) => {
   const { code } = req.params;
    try {
     const results = await db.query(`SELECT * FROM companies WHERE code = $1 `, [code]);
-    return res.json({ comapny: results.rows[0] })
+    return res.json({ company: results.rows[0] })
   } catch (e) {
     return next(e);
   }
